@@ -1,17 +1,18 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSocket } from "../context/SocketProvider.jsx";
+import { useSocket } from "../context/SocketProvider";
 
-function Lobby() {
+const LobbyScreen = () => {
   const [email, setEmail] = useState("");
   const [room, setRoom] = useState("");
+
   const socket = useSocket();
   const navigate = useNavigate();
 
   const handleSubmitForm = useCallback(
     (e) => {
       e.preventDefault();
-      socket.emit("Join-Room", { email, room });
+      socket.emit("room:join", { email, room });
     },
     [email, room, socket]
   );
@@ -25,9 +26,9 @@ function Lobby() {
   );
 
   useEffect(() => {
-    socket.on("Join-Room", handleJoinRoom);
+    socket.on("room:join", handleJoinRoom);
     return () => {
-      socket.off("Join-Room", handleJoinRoom);
+      socket.off("room:join", handleJoinRoom);
     };
   }, [socket, handleJoinRoom]);
 
@@ -35,27 +36,26 @@ function Lobby() {
     <div>
       <h1>Lobby</h1>
       <form onSubmit={handleSubmitForm}>
-        <label htmlFor="email">Email ID:</label>
+        <label htmlFor="email">Email ID</label>
         <input
           type="email"
           id="email"
-          placeholder="Enter your Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <br />
-        <label htmlFor="room">Room Number:</label>
+        <label htmlFor="room">Room Number</label>
         <input
           type="text"
           id="room"
-          placeholder="Room Number"
           value={room}
           onChange={(e) => setRoom(e.target.value)}
         />
         <br />
-        <button type="submit">Join Room</button>
+        <button>Join</button>
       </form>
     </div>
   );
-}
-export default Lobby;
+};
+
+export default LobbyScreen;
